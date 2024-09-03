@@ -1,0 +1,257 @@
+-- Arquivo: empresa-PRONTUARIO.sql
+-- Cria o banco de dados empresaPRONTUARIO
+-- Autor: Abra�o Garcia
+
+
+-- Cria o banco de dados
+CREATE DATABASE EmpresaCJ302573X;
+GO
+
+-- Habilita o contexto
+USE EmpresaCJ302573X;
+GO
+
+-- Cria a tabela FUNCIONARIOS
+CREATE TABLE FUNCIONARIOS (
+ID INT PRIMARY KEY,
+Nome VARCHAR(25) NOT NULL,
+Sexo CHAR(1) NULL,
+Admissao DATE NOT NULL,
+Salario DECIMAL(10,2) NOT NULL
+);
+GO
+
+-- Inser��o de dados
+
+-- Alterar o formato de data do SQL Server
+SET DATEFORMAT DMY;
+GO
+
+-- Insere dados na tabela FUNCIONARIOS
+INSERT INTO FUNCIONARIOS (
+ID,
+Nome,
+Sexo,
+Admissao,
+Salario)
+VALUES (1, 'Maria da Silva', 'F', '10/01/2018', 2500.00);
+GO
+
+-- Insere dados na tabela de FUNCIONARIOS 
+INSERT INTO FUNCIONARIOS VALUES (2, 'Pedro Pereira', 'M', '25/05/2015', 99.00);
+GO
+
+-- Continua��o da inser��o de conteudos na tabela FUNCIONARIO
+INSERT INTO FUNCIONARIOS VALUES (3, 'Maria Cristina', 'F', '10/09/2015', 1200.00);
+INSERT INTO FUNCIONARIOS VALUES (4, 'Antonio Carlos', 'M', '15/05/2015', 990.00);
+GO
+
+--Outro metodo de inser��o de conteudo na tabela FUNCIONARIOS
+INSERT INTO FUNCIONARIOS VALUES	
+	(5, 'Marcelo Augusto', 'M', '09/12/2017', 1900.00),
+	(6, 'Pedro Silva', 'M', '15/11/2015', 1050.00),
+	(7, 'M�nica da Silva', 'F', '12/10/2014', 3000.00),
+	(8, 'Tiago Lima', 'M', '10/05/2016', 1350.50);
+GO
+
+-- Exibe algumas informa��es dos funcionarios, 
+-- utilizando aliases para algumas colunas
+SELECT ID AS 'C�digo do Funcionario',
+	Nome,
+	Sexo,
+	Salario AS 'Sal�rio'
+FROM FUNCIONARIOS;
+GO
+
+-- Parametro TOP limita o numero de registros
+SELECT TOP 3 *
+FROM FUNCIONARIOS 
+GO
+
+-- Comando WHERE:USA parametro para compara��o
+-- Exibir todos os funcionarios masculinos, cujo o s�lario � maior do que 1000.00 reais
+SELECT * FROM FUNCIONARIOS 
+WHERE Sexo = 'M' and Salario > 1000
+GO
+
+-- Seleciona todos os funcion�rios, ordenando o 
+-- resultado em ordem alfab�tica (A-Z)
+SELECT * FROM FUNCIONARIOS 
+ORDER BY Nome;
+GO
+
+-- Ordenar  de cima para baixo em ordem alfab�tica
+SELECT * FROM FUNCIONARIOS 
+ORDER BY Nome ASC;
+GO
+
+-- Ordenar de baixo para cima em ordem alfab�tica
+SELECT * FROM FUNCIONARIOS 
+ORDER BY Nome DESC;
+GO
+
+-- Inseri dois novos funcionarios 
+-- Observe que os nomes s�o iguais
+INSERT INTO FUNCIONARIOS VALUES
+	(9, 'Maria Cristina', 'F', '21/09/2012', 1700.00),
+	(10, 'Maria Cristina', 'F', '10/10/2017', 1400.00);
+GO
+
+-- Seleciona os registros de todos os funcionarios,
+-- ordenando o resultado pelo nome em ordem alfabetica (A-Z),
+-- seguido pelos registros dos funcionarios que tem o maior 
+-- salario. Exibe somente os registros dos funcionarios 
+-- cujo salario seja menor do que 3000 reais.
+SELECT * FROM FUNCIONARIOS 
+WHERE Salario < 3000
+ORDER BY Nome,
+		Salario DESC;
+GO
+
+----------------------------------------------------------
+-- Alterando a estruura da tabela ALTER DROP
+-- ALTER TABLE [NOME DA TABELA]
+	-- DROP
+	-- CONSTRAINT [NOME DA RESTRI��O]
+	--[,CONSTRAINT [NOME DA RESTRI��O]];
+-- GO 
+
+-- Criando uma tabela para testes
+CREATE TABLE TESTE_TESTE (
+	ID INT,
+	Nome CHAR(10)
+);
+GO
+
+--Exibe informa��es sobre a estrutura da tabela
+EXEC sp_columns TESTE_TESTE;
+GO
+-- Utilizado pelo Microsoft SQL Server
+
+
+-- Outra forma de exibir informa��es sobre a estrutura da tabela
+SELECT *
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'TESTE_TESTE';
+GO
+
+--Exibe informa��es espec�ficas sobre a estrutura da tabela
+SELECT TABLE_CATALOG		AS 'Banco de dados',
+	   TABLE_NAME			AS 'Tabela',
+	   ORDINAL_POSITION		AS 'Posi��o',
+	   COLUMN_NAME			AS 'Coluna',
+	   DATA_TYPE			AS 'Tipo de Dados',
+	   COLLATION_NAME		AS 'Idioma da Coluna',
+	   IS_NULLABLE			AS 'Aceita Nulo?'
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'TESTE_TESTE';
+GO
+
+-- Adicona a coluna Sexo
+ALTER TABLE TESTE_TESTE 
+	ADD Sexo CHAR(1) NULL;
+GO
+
+-- Adiciona as colunas DataNascimento e Peso
+ALTER TABLE TESTE_TESTE
+	ADD DataNascimento DATE,
+		Peso DECIMAL (5,2);
+GO
+
+-- Remove a coluna DataNascimento
+ALTER TABLE TESTE_TESTE
+	DROP COLUMN DataNascimento
+GO
+
+-- Adiciona uma restri��o n�o nomeada,
+-- do tipo �nica, na coluna Sexo.
+ALTER TABLE TESTE_TESTE 
+	ADD UNIQUE (Sexo);
+GO
+
+-- Alterar a coluna ID, indicando que ela
+-- n�o pode ser nula.
+ALTER TABLE TESTE_TESTE
+	ALTER COLUMN ID INT NOT NULL;
+GO
+
+-- Adiciona uma restri��o nomeada,
+-- do tipo chave prim�ria, na coluna ID.
+ALTER TABLE TESTE_TESTE
+	ADD CONSTRAINT pk_id PRIMARY KEY (ID);
+GO
+
+-- Exibe informa��es sobre as restri��es que 
+-- existem na tabela.
+EXEC sp_helpconstraint TESTE_TESTE;
+GO
+
+-- Exibe informa��es sobre as restri��es da tabela
+SELECT CONSTRAINT_CATALOG AS 'Banco de Dados',
+	   TABLE_NAME		  AS 'Tabela',
+	   CONSTRAINT_TYPE	  AS 'Tipo de Restri��o',
+	   CONSTRAINT_NAME	  AS 'Nome da Restri��o'
+FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+WHERE TABLE_NAME = 'TESTE';
+GO
+
+-- Remove uma restri��o nomeada
+ALTER TABLE TESTE_TESTE
+	DROP CONSTRAINT pk_id;
+GO
+
+-- Exclui a tabela TESTE_TESTE
+DROP TABLE TESTE_TESTE;
+GO
+
+-- Criar a tabela CLIENTES
+CREATE TABLE CLIENTES_CJ302573X (
+	ID INT PRIMARY KEY,
+	Nome VARCHAR (50) NOT NULL,
+	Sexo VARCHAR (1) NULL,
+	Idade INT CHECK (Idade > 18) NOT NULL,
+	CPF CHAR (11) UNIQUE NOT NULL,
+	Email VARCHAR (200) DEFAULT 'meu@email.com' NOT NULL
+);
+GO
+
+-- Utilizando o comando SP_HELP
+-- A tecla de atalho para este mesmo comando �: ALT + F1.
+EXEC sp_help 'CLIENTES_CJ302573X';
+GO
+
+-- Crie uma tabela temporaria local #
+CREATE TABLE #TabelaA (
+	ID INT NOT NULL,
+	Nome VARCHAR (25) NOT NULL,
+	Sexo CHAR(1) NULL,
+	PRIMARY KEY (ID)
+);
+GO
+	
+-- Adicione informa��es a tabelaA
+INSERT INTO #TabelaA VALUES 
+	(1, 'Marcelo Augusto', 'M'),
+	(2, 'Maria Cristina', 'F');
+GO
+
+
+-- Crie uma tabela temporaria global ##
+CREATE TABLE ##TabelaB (
+	ID INT NOT NULL,
+	Nome VARCHAR (25) NOT NULL,
+	Sexo CHAR(1) NULL,
+	PRIMARY KEY (ID)
+);
+GO
+
+-- Adicione informa��es a tabelaB
+INSERT INTO ##TabelaB VALUES 
+	(1, 'Marcelo Augusto', 'M'),
+	(2, 'Maria Cristina', 'F');
+GO
+
+-- Exibe o conteudo da tabela FUNCIONARIOS
+SELECT * FROM #TabelaA;
+GO
+
