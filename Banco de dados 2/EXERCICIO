@@ -1,0 +1,91 @@
+-- Criar um banco de dados para o exercicio 1
+
+IF DB_ID (N'LojaIFSP') IS NULL
+	CREATE DATABASE LojaIFSP;
+ELSE 
+	USE LojaIFSP;
+GO
+
+SELECT CREATE_DATE AS 'DATA DE CRIAÇÃO',
+	   NAME		   AS ' NOME DA TABELA'
+FROM SYS.TABLES;
+GO
+
+CREATE TABLE CLIENTES (
+	ID INT PRIMARY KEY,
+	Nome VARCHAR (50) NOT NULL,
+	Sexo VARCHAR (50) NULL,
+	Idade INT CHECK (Idade >18) NOT NULL,
+	CPF CHAR (11) UNIQUE NOT NULL,
+	Email VARCHAR (200) DEFAULT 'meu@email.com' NOT NULL
+);
+GO
+
+-- 1)
+SELECT * FROM CLIENTES;
+GO
+
+--  2)
+SELECT * FROM CLIENTES 
+ORDER BY Nome;
+GO
+
+-- 3)
+SELECT * FROM CLIENTES
+ORDER BY Idade;
+GO
+
+-- 4)
+SELECT * FROM CLIENTES
+ORDER BY Idade DESC;
+GO
+
+-- 5)
+SELECT * FROM CLIENTES
+ORDER BY Sexo DESC,
+	     idade;
+GO
+
+-- 6)
+SELECT Nome, 
+	   Idade, 
+	   Email
+FROM CLIENTES;
+GO
+
+-- 7)
+SELECT Nome, 
+	   Idade, 
+	   Email
+FROM CLIENTES
+ORDER BY Nome;
+GO
+
+-- 8)
+SELECT ID AS 'Código do Cliente',
+	   Nome, 
+	   Idade, 
+	   Email
+FROM CLIENTES
+WHERE >= 10;
+GO
+
+-- 9)
+SELECT TOP 5 ID AS 'Código do Cliente',
+	   Nome, 
+	   Idade, 
+	   Email
+FROM CLIENTES
+ORDER BY Nome;
+GO
+
+-- 10)
+SELECT ID AS 'Código do Cliente',
+	   Nome, 
+	   Sexo,
+	   Idade, 
+	   Email AS 'E-mail'
+FROM CLIENTES
+WHERE Idade > 30 AND Sexo = 'M'
+ORDER BY Nome;
+GO
