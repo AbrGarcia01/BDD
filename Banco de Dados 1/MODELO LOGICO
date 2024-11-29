@@ -1,4 +1,3 @@
-Tabelas e RelacionamentoS
 1. CLIENTES
    - Atributos:
      - ID_CLIENTE (PK)
@@ -7,9 +6,9 @@ Tabelas e RelacionamentoS
      - TELEFONE
      - EMAIL
 
-   - Relacionamento:
-     - 1:N com `VENDAS` (ID_CLIENTE).
-     - 1:N com `RECEITASMEDICAS` (ID_CLIENTE).
+   - Relacionamentos:
+     - 1:N com `VENDAS` (ID_CLIENTE) — Um cliente pode realizar várias vendas.
+     - 1:N com `RECEITASMEDICAS` (ID_CLIENTE) — Um cliente pode ter várias receitas médicas.
 
 2. FUNCIONARIOS
    - Atributos:
@@ -21,8 +20,8 @@ Tabelas e RelacionamentoS
      - CARGO
      - DATA_CONTRATACAO
 
-   - Relacionamento:
-     - 1:N com `VENDAS` (ID_FUNCIONARIO).
+   - Relacionamentos:
+     - 1:N com `VENDAS` (ID_FUNCIONARIO) — Cada venda é feita por um funcionário.
 
 3. CATEGORIAPRODUTOS
    - Atributos:
@@ -30,8 +29,8 @@ Tabelas e RelacionamentoS
      - NOME
      - DESCRICAO
 
-   - Relacionamento:
-     - 1:N com `PRODUTOS` (ID_CATEGORIA).
+   - Relacionamentos:
+     - 1:N com `PRODUTOS` (ID_CATEGORIA) — Cada categoria pode ter vários produtos.
 
 4. REGISTROARMAZENAMENTO
    - Atributos:
@@ -41,9 +40,9 @@ Tabelas e RelacionamentoS
      - QUANTIDADE
      - ID_FORNECEDOR (FK)
 
-   - Relacionamento:
-     - N:1 com `PRODUTOS` (ID_PRODUTO).
-     - N:1 com `FORNECEDOR` (ID_FORNECEDOR).
+   - Relacionamentos:
+     - N:1 com `PRODUTOS` (ID_PRODUTO) — Cada registro de armazenamento está relacionado a um produto.
+     - N:1 com `FORNECEDOR` (ID_FORNECEDOR) — Cada registro de armazenamento está relacionado a um fornecedor específico.
 
 5. FORNECEDOR
    - Atributos:
@@ -53,8 +52,8 @@ Tabelas e RelacionamentoS
      - EMAIL
      - ENDERECO
 
-   - Relacionamento:
-     - 1:N com `REGISTROARMAZENAMENTO` (ID_FORNECEDOR).
+   - Relacionamentos:
+     - 1:N com `REGISTROARMAZENAMENTO` (ID_FORNECEDOR) — Cada fornecedor pode fornecer vários produtos.
 
 6. ESTOQUE
    - Atributos:
@@ -63,20 +62,22 @@ Tabelas e RelacionamentoS
      - QUANTIDADE_TOTAL
      - LOCALIZACAO
 
-   - Relacionamento:
-     - N:1 com `PRODUTOS` (ID_PRODUTO).
+   - Relacionamentos:
+     - N:1 com `PRODUTOS` (ID_PRODUTO) — Cada produto pode ter várias quantidades armazenadas, 
+         mas cada quantidade é atribuída a um único produto.
 
-7. CONTROLEESTOQUE
+7. CONTROLEESTOQUES
    - Atributos:
      - ID_CONTROLE (PK)
      - ID_PRODUTO (FK)
      - QUANTIDADE_ATUAL
      - DATA_ATUALIZACAO
 
-   - Relacionamento:
-     - N:1 com `PRODUTOS` (ID_PRODUTO).
+   - Relacionamentos:
+     - N:1 com `PRODUTOS` (ID_PRODUTO) — Cada controle de estoque está vinculado 
+         a um produto específico, representando a quantidade atual.
 
-8. PAGAMENTO
+8. PAGAMENTOS
    - Atributos:
      - ID_PAGAMENTO (PK)
      - DATA_PAGAMENTO
@@ -84,8 +85,8 @@ Tabelas e RelacionamentoS
      - METODO_PAGAMENTO
      - ID_VENDA (FK)
 
-   - Relacionamento:
-     - N:1 com `VENDAS` (ID_VENDA).
+   - Relacionamentos:
+     - N:1 com `VENDAS` (ID_VENDA) — Um pagamento é sempre relacionado a uma única venda.
 
 9. PRODUTOS
    - Atributos:
@@ -95,10 +96,10 @@ Tabelas e RelacionamentoS
      - PRECO
      - ID_CATEGORIA (FK)
 
-   - Relacionamento:
-     - 1:N com `REGISTROARMAZENAMENTO` (ID_PRODUTO).
-     - 1:N com `ESTOQUE` (ID_PRODUTO).
-     - 1:N com `CONTROLEESTOQUE` (ID_PRODUTO).
+   - Relacionamentos:
+     - 1:N com `REGISTROARMAZENAMENTO` (ID_PRODUTO) — Um produto pode ter vários registros de armazenamento.
+     - 1:N com `ESTOQUE` (ID_PRODUTO) — Um produto pode estar armazenado em vários locais de estoque.
+     - 1:N com `CONTROLEESTOQUE` (ID_PRODUTO) — Um produto pode ter vários registros de controle de estoque.
 
 10. VENDAS
     - Atributos:
@@ -108,19 +109,19 @@ Tabelas e RelacionamentoS
       - ID_FUNCIONARIO (FK)
       - VALOR_TOTAL
 
-    - Relacionamento:
-      - 1:N com `PAGAMENTO` (ID_VENDA).
+    - Relacionamentos:
+      - 1:N com `PAGAMENTO` (ID_VENDA) — Cada venda pode ter um ou mais pagamentos.
 
-11. **ITENSVENDA**
-   - **ID_VENDA** (PK, FK)
-   - **ID_PRODUTO** (PK, FK)
-   - QUANTIDADE
-   - PRECO_UNITARIO
+11. ITENSVENDA
+   - Atributos:
+     - ID_VENDA (PK, FK)
+     - ID_PRODUTO (PK, FK)
+     - QUANTIDADE
+     - PRECO_UNITARIO
 
    - Relacionamentos:
-     - `ITENSVENDA` tem uma chave primária composta por `ID_VENDA` e `ID_PRODUTO`, representando uma relação de muitos-para-muitos entre `VENDAS` e `PRODUTOS`.
-     - `ID_VENDA` é uma chave estrangeira referenciando `VENDAS(ID_VENDA)`.
-     - `ID_PRODUTO` é uma chave estrangeira referenciando `PRODUTOS(ID_PRODUTO)`.
+     - M:N entre `VENDAS` e `PRODUTOS` — A relação de muitos-para-muitos é resolvida com a tabela `ITENSVENDA`, 
+      indicando que uma venda pode ter vários produtos e um produto pode ser vendido em várias vendas.
 
 12. RECEITASMEDICAS
     - Atributos:
@@ -128,12 +129,16 @@ Tabelas e RelacionamentoS
       - ID_CLIENTE (FK)
       - ID_PRESCRICAO (FK)
       - DATA_RECEITA
-    - Relacionamento:
-      - N:1 com `CLIENTES` (ID_CLIENTE).
-      - N:1 com `PRESCRICOES` (ID_PRESCRICAO).
+
+    - Relacionamentos:
+      - N:1 com `CLIENTES` (ID_CLIENTE) — Cada receita médica está vinculada a um cliente.
+      - N:1 com `PRESCRICOES` (ID_PRESCRICAO) — Cada receita médica se refere a uma prescrição específica.
 
 13. PRESCRICOES
     - Atributos:
       - ID_PRESCRICAO (PK)
       - DESCRICAO
       - DATA_PRESCRICAO
+
+    - Relacionamentos:
+      - 1:N com `RECEITASMEDICAS` (ID_PRESCRICAO) — Cada prescrição pode gerar várias receitas médicas.
