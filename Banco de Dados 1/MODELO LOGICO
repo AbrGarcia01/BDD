@@ -51,6 +51,7 @@
      - TELEFONE
      - EMAIL
      - ENDERECO
+     - CNPJ 
 
    - Relacionamentos:
      - 1:N com `REGISTROARMAZENAMENTO` (ID_FORNECEDOR) — Cada fornecedor pode fornecer vários produtos.
