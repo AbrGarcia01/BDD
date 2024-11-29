@@ -1,0 +1,139 @@
+Tabelas e RelacionamentoS
+1. CLIENTES
+   - Atributos:
+     - ID_CLIENTE (PK)
+     - NOME
+     - CPF (Unique)
+     - TELEFONE
+     - EMAIL
+
+   - Relacionamento:
+     - 1:N com `VENDAS` (ID_CLIENTE).
+     - 1:N com `RECEITASMEDICAS` (ID_CLIENTE).
+
+2. FUNCIONARIOS
+   - Atributos:
+     - ID_FUNCIONARIO (PK)
+     - NOME
+     - CPF (Unique)
+     - TELEFONE
+     - EMAIL
+     - CARGO
+     - DATA_CONTRATACAO
+
+   - Relacionamento:
+     - 1:N com `VENDAS` (ID_FUNCIONARIO).
+
+3. CATEGORIAPRODUTOS
+   - Atributos:
+     - ID_CATEGORIA (PK)
+     - NOME
+     - DESCRICAO
+
+   - Relacionamento:
+     - 1:N com `PRODUTOS` (ID_CATEGORIA).
+
+4. REGISTROARMAZENAMENTO
+   - Atributos:
+     - ID_REGISTRO (PK)
+     - DATA_REGISTRO
+     - ID_PRODUTO (FK)
+     - QUANTIDADE
+     - ID_FORNECEDOR (FK)
+
+   - Relacionamento:
+     - N:1 com `PRODUTOS` (ID_PRODUTO).
+     - N:1 com `FORNECEDOR` (ID_FORNECEDOR).
+
+5. FORNECEDOR
+   - Atributos:
+     - ID_FORNECEDOR (PK)
+     - NOME
+     - TELEFONE
+     - EMAIL
+     - ENDERECO
+
+   - Relacionamento:
+     - 1:N com `REGISTROARMAZENAMENTO` (ID_FORNECEDOR).
+
+6. ESTOQUE
+   - Atributos:
+     - ID_ESTOQUE (PK)
+     - ID_PRODUTO (FK)
+     - QUANTIDADE_TOTAL
+     - LOCALIZACAO
+
+   - Relacionamento:
+     - N:1 com `PRODUTOS` (ID_PRODUTO).
+
+7. CONTROLEESTOQUE
+   - Atributos:
+     - ID_CONTROLE (PK)
+     - ID_PRODUTO (FK)
+     - QUANTIDADE_ATUAL
+     - DATA_ATUALIZACAO
+
+   - Relacionamento:
+     - N:1 com `PRODUTOS` (ID_PRODUTO).
+
+8. PAGAMENTO
+   - Atributos:
+     - ID_PAGAMENTO (PK)
+     - DATA_PAGAMENTO
+     - VALOR
+     - METODO_PAGAMENTO
+     - ID_VENDA (FK)
+
+   - Relacionamento:
+     - N:1 com `VENDAS` (ID_VENDA).
+
+9. PRODUTOS
+   - Atributos:
+     - ID_PRODUTO (PK)
+     - NOME
+     - DESCRICAO
+     - PRECO
+     - ID_CATEGORIA (FK)
+
+   - Relacionamento:
+     - 1:N com `REGISTROARMAZENAMENTO` (ID_PRODUTO).
+     - 1:N com `ESTOQUE` (ID_PRODUTO).
+     - 1:N com `CONTROLEESTOQUE` (ID_PRODUTO).
+
+10. VENDAS
+    - Atributos:
+      - ID_VENDA (PK)
+      - DATA_VENDA
+      - ID_CLIENTE (FK)
+      - ID_FUNCIONARIO (FK)
+      - VALOR_TOTAL
+
+    - Relacionamento:
+      - 1:N com `PAGAMENTO` (ID_VENDA).
+
+11. **ITENSVENDA**
+   - **ID_VENDA** (PK, FK)
+   - **ID_PRODUTO** (PK, FK)
+   - QUANTIDADE
+   - PRECO_UNITARIO
+
+   - Relacionamentos:
+     - `ITENSVENDA` tem uma chave primária composta por `ID_VENDA` e `ID_PRODUTO`, representando uma relação de muitos-para-muitos entre `VENDAS` e `PRODUTOS`.
+     - `ID_VENDA` é uma chave estrangeira referenciando `VENDAS(ID_VENDA)`.
+     - `ID_PRODUTO` é uma chave estrangeira referenciando `PRODUTOS(ID_PRODUTO)`.
+
+12. RECEITASMEDICAS
+    - Atributos:
+      - ID_RECEITA (PK)
+      - ID_CLIENTE (FK)
+      - ID_PRESCRICAO (FK)
+      - DATA_RECEITA
+    - Relacionamento:
+      - N:1 com `CLIENTES` (ID_CLIENTE).
+      - N:1 com `PRESCRICOES` (ID_PRESCRICAO).
+
+13. PRESCRICOES
+    - Atributos:
+      - ID_PRESCRICAO (PK)
+      - DESCRICAO
+      - DATA_PRESCRICAO
