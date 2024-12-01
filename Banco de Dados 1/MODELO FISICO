@@ -8,8 +8,8 @@ GO
 
 CREATE TABLE CLIENTES (
     ID_CLIENTE INT PRIMARY KEY,
-    Nome_Cliente NVARCHAR(100),
-    CPF_Cliente CHAR(11),
+    Nome_Cliente NVARCHAR(100) NOT NULL,
+    CPF_Cliente CHAR(11) UNIQUE NOT NULL,
     Telefone_Cliente NVARCHAR(15),
     Email_Cliente NVARCHAR(100)
 );
@@ -19,7 +19,7 @@ GO
 CREATE TABLE FUNCIONARIOS (
     ID_FUNCIONARIO INT PRIMARY KEY,
     Nome_Funcionario NVARCHAR(100),
-    CPF_Funcionario CHAR(11),
+    CPF_Funcionario CHAR(11) UNIQUE NOT NULL,
     Telefone_Funcionario NVARCHAR(15),
     Data_Contratacao DATE,
     Salario DECIMAL(10, 2),
@@ -31,7 +31,7 @@ GO
 
 CREATE TABLE CATEGORIAPRODUTOS (
     ID_CATEGORIA INT PRIMARY KEY,
-    Nome_Categoria NVARCHAR(50),
+    Nome_Categoria NVARCHAR(50) NOT NULL,
     Descricao_Categoria NVARCHAR(500)
 );
 GO
@@ -39,7 +39,7 @@ GO
 
 CREATE TABLE PRODUTOS (
     ID_PRODUTOS INT PRIMARY KEY,
-    Nome_Produto NVARCHAR(100),
+    Nome_Produto NVARCHAR(100) NOT NULL,
     Descricao_Produto NVARCHAR(500),
     Preco_Produto DECIMAL(10, 2),
     ID_CATEGORIA INT,
@@ -50,11 +50,11 @@ GO
 
 CREATE TABLE FORNECEDORES (
     ID_FORNCEDOR INT PRIMARY KEY,
-    Nome_Fornecedor NVARCHAR(100),
+    Nome_Fornecedor NVARCHAR(100) NOT NULL,
     Telefone_Fornecedor NVARCHAR(15),
     Email_Fornecedor NVARCHAR(100),
     Endereco_Fornecedor NVARCHAR(200),
-    CNPJ_Fornecedor CHAR(14)
+    CNPJ_Fornecedor CHAR(14) UNIQUE NOT NULL
 );
 GO
 
@@ -127,3 +127,191 @@ CREATE TABLE RECEITASMEDICA (
 );
 GO
 
+
+-- 1. Verifica clientes que não possuem e-mail cadastrado
+SELECT * FROM CLIENTES WHERE Email_Cliente IS NULL;
+GO
+
+-- 2. Exibe o nome dos clientes em ordem alfabética
+SELECT Nome_Cliente FROM CLIENTES ORDER BY Nome_Cliente;
+GO
+
+-- 3. Filtrar clientes com telefone começando com "11"
+SELECT * FROM CLIENTES WHERE Telefone_Cliente LIKE '11%';
+GO
+
+-- 4. Produtos com preços acima de R$100,00
+SELECT * FROM PRODUTOS WHERE Preco_Produto > 100;
+GO
+
+-- 5. Lista produtos por categorias específicas
+SELECT Nome_Produto FROM PRODUTOS WHERE ID_CATEGORIA = 1;
+GO
+
+-- 6. Ordena produtos pelo preço de forma crescente 
+SELECT Nome_Produto, Preco_Produto FROM PRODUTOS ORDER BY Preco_Produto;
+GO
+
+-- 7. Quantidade total de produtos em estoque
+SELECT SUM(Quantidade_Estoque) AS Total_Estoque FROM ESTOQUES;
+GO
+
+-- 8. Preço médio dos produtos
+SELECT AVG(Preco_Produto) AS Preco_Medio FROM PRODUTOS;
+GO
+
+-- 10. Total de vendas realizadas por funcionário específico
+SELECT COUNT(*) AS Total_Vendas 
+FROM VENDAS 
+WHERE ID_FUNCIONARIO = 3;
+GO
+
+-- 11. Valor total de vendas realizadas
+SELECT SUM(Valor_Venda) AS Total_Vendas FROM VENDAS;
+GO
+
+-- 12. Encontrar funcionários com maior salário
+SELECT TOP 1 * FROM FUNCIONARIOS ORDER BY Salario DESC;
+GO
+
+-- 12. Listar funcionários que foram contratados antes de 2020
+SELECT * FROM FUNCIONARIOS WHERE Data_Contratacao < '2020-01-01';
+GO
+
+-- 13. Produtos vendidos em uma venda específica
+SELECT p.Nome_Produto, i.Quantidade_Venda
+FROM ITENSVENDA i
+INNER JOIN PRODUTOS p ON i.ID_PRODUTO = p.ID_PRODUTOS
+WHERE i.ID_VENDA = 10;
+GO
+
+-- 14. Receitas médicas associadas a um cliente específico
+SELECT * FROM RECEITASMEDICA WHERE ID_CLIENTE = 4;
+GO
+
+-- 15. Obter o total de vendas realizadas por cada funcionarios e ordená-las
+-- do maior para o menor 
+SELECT f.Nome_Funcionario, COUNT(v.ID_VENDA) AS Total_Vendas
+FROM FUNCIONARIOS f
+LEFT JOIN VENDAS v ON f.ID_FUNCIONARIO = v.ID_FUNCIONARIO
+GROUP BY f.Nome_Funcionario
+ORDER BY Total_Vendas DESC;
+GO
+
+-- 16. Clientes que fizera, compras acima de R$500,00
+SELECT c.Nome_Cliente, v.Valor_Venda
+FROM CLIENTES c
+INNER JOIN VENDAS v ON c.ID_CLIENTE = v.ID_CLIENTE
+WHERE v.Valor_Venda > 500;
+GO
+
+-- 17. Receitas médicas criadas nos últimos 30 dias
+SELECT * 
+FROM RECEITASMEDICA
+WHERE Data_Receita >= DATEADD(DAY, -30, GETDATE());
+GO
+
+-- 18. Métodos de pagamento mais utilizados
+SELECT Metodo_Pagamento, COUNT(*) AS Total
+FROM PAGAMENTOS
+GROUP BY Metodo_Pagamento
+ORDER BY Total DESC;
+GO
+
+-- 19. Lucro total por produto, considerando a quantidade
+-- vendida e preço unitário
+SELECT p.Nome_Produto, SUM(i.Quantidade_Venda * i.Preco_Unitario) AS Lucro_Total
+FROM ITENSVENDA i
+INNER JOIN PRODUTOS p ON i.ID_PRODUTO = p.ID_PRODUTOS
+GROUP BY p.Nome_Produto
+ORDER BY Lucro_Total DESC;
+GO
+
+-- 20. Funcionarios que não realizaram vendas 
+SELECT f.Nome_Funcionario
+FROM FUNCIONARIOS f
+LEFT JOIN VENDAS v ON f.ID_FUNCIONARIO = v.ID_FUNCIONARIO
+WHERE v.ID_FUNCIONARIO IS NULL;
+GO
+
+-- 21. Categoria com o maior números de produtos
+SELECT c.Nome_Categoria, COUNT(p.ID_PRODUTOS) AS Total_Produtos
+FROM CATEGORIAPRODUTOS c
+INNER JOIN PRODUTOS p ON c.ID_CATEGORIA = p.ID_CATEGORIA
+GROUP BY c.Nome_Categoria
+ORDER BY Total_Produtos DESC;
+GO
+
+-- 21. Histórico de vendas por cliente, nome e data
+SELECT c.Nome_Cliente, v.Data_Venda, v.Valor_Venda
+FROM CLIENTES c
+INNER JOIN VENDAS v ON c.ID_CLIENTE = v.ID_CLIENTE
+ORDER BY v.Data_Venda DESC;
+GO
+
+-- 22. Obter o nome e o telefone dos fornecedores que 
+-- forneceram mais de 10 produtos
+SELECT f.Nome_Fornecedor, f.Telefone_Fornecedor, COUNT(r.ID_PRODUTO) AS Produtos_Fornecidos
+FROM FORNECEDORES f
+INNER JOIN REGISTROARMAZENAMENTO r ON f.ID_FORNCEDOR = r.ID_FORNECEDOR
+GROUP BY f.Nome_Fornecedor, f.Telefone_Fornecedor
+HAVING COUNT(r.ID_PRODUTO) > 10;
+GO
+
+-- 23. Calcular a receita total gerada por categoria de produto
+SELECT c.Nome_Categoria, SUM(i.Quantidade_Venda * i.Preco_Unitario) AS Receita_Total
+FROM CATEGORIAPRODUTOS c
+INNER JOIN PRODUTOS p ON c.ID_CATEGORIA = p.ID_CATEGORIA
+INNER JOIN ITENSVENDA i ON p.ID_PRODUTOS = i.ID_PRODUTO
+GROUP BY c.Nome_Categoria;
+GO
+
+-- 24. Listar os três produtos mais caros e suas categorias 
+SELECT TOP 3 p.Nome_Produto, p.Preco_Produto, c.Nome_Categoria
+FROM PRODUTOS p
+INNER JOIN CATEGORIAPRODUTOS c ON p.ID_CATEGORIA = c.ID_CATEGORIA
+ORDER BY p.Preco_Produto DESC;
+GO
+
+-- 25. Identificar os funcionários que realizaram vendas acima da média geral
+SELECT f.Nome_Funcionario, SUM(v.Valor_Venda) AS Valor_Total
+FROM FUNCIONARIOS f
+INNER JOIN VENDAS v ON f.ID_FUNCIONARIO = v.ID_FUNCIONARIO
+GROUP BY f.Nome_Funcionario
+HAVING SUM(v.Valor_Venda) > (
+    SELECT AVG(Valor_Venda) FROM VENDAS
+);
+GO
+
+-- 26. Produtos com estoque abaixo de 10 unidades
+SELECT p.Nome_Produto, e.Quantidade_Estoque
+FROM PRODUTOS p
+INNER JOIN ESTOQUES e ON p.ID_PRODUTOS = e.ID_PRODUTO
+WHERE e.Quantidade_Estoque < 10;
+GO
+
+-- 27. Produtos com preços entre R$50,00 e R$150,00 e suas descrições
+SELECT Nome_Produto, Descricao_Produto, Preco_Produto
+FROM PRODUTOS
+WHERE Preco_Produto BETWEEN 50 AND 150;
+GO
+
+-- 28. Números de receitas médicas emitidas por clientes
+SELECT c.Nome_Cliente, COUNT(r.ID_RECEITA) AS Total_Receitas
+FROM CLIENTES c
+LEFT JOIN RECEITASMEDICA r ON c.ID_CLIENTE = r.ID_CLIENTE
+GROUP BY c.Nome_Cliente;
+GO
+
+-- 29. Listar os funcionários com mais de 2 anos de contratação
+SELECT Nome_Funcionario, Data_Contratacao
+FROM FUNCIONARIOS
+WHERE DATEDIFF(YEAR, Data_Contratacao, GETDATE()) > 2;
+GO
+
+-- 30. Obter a média de preço dos produtos em cada categoria
+SELECT c.Nome_Categoria, AVG(p.Preco_Produto) AS Preco_Medio
+FROM CATEGORIAPRODUTOS c
+INNER JOIN PRODUTOS p ON c.ID_CATEGORIA = p.ID_CATEGORIA
+GROUP BY c.Nome_Categoria;
+GO
