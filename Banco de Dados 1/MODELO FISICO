@@ -31,7 +31,7 @@ GO
 CREATE TABLE CATEGORIAPRODUTOS (
     ID_CATEGORIA INT PRIMARY KEY,
     Nome_Categoria NVARCHAR(50),
-    Descricao_Categoria NVARCHAR(200)
+    Descricao_Categoria NVARCHAR(500)
 );
 GO
 
@@ -39,7 +39,7 @@ GO
 CREATE TABLE PRODUTOS (
     ID_PRODUTOS INT PRIMARY KEY,
     Nome_Produto NVARCHAR(100),
-    Descricao_Produto NVARCHAR(200),
+    Descricao_Produto NVARCHAR(500),
     Preco_Produto DECIMAL(10, 2),
     ID_CATEGORIA INT,
     FOREIGN KEY (ID_CATEGORIA) REFERENCES CATEGORIAPRODUTOS(ID_CATEGORIA)
@@ -131,7 +131,7 @@ GO
 
 CREATE TABLE PRESCRICAO (
     ID_PRESCRICAO INT PRIMARY KEY,
-    Descricao_Prescricao NVARCHAR(200),
+    Descricao_Prescricao NVARCHAR(500),
     Data_Precricao DATE
 );
 GO
