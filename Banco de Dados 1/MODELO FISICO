@@ -22,6 +22,7 @@ CREATE TABLE FUNCIONARIOS (
     CPF_Funcionario CHAR(11),
     Telefone_Funcionario NVARCHAR(15),
     Data_Contratacao DATE,
+    Salario DECIMAL(10, 2),
     Email_Funcionario NVARCHAR(100),
     Cargo NVARCHAR(50)
 );
