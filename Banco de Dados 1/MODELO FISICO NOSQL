@@ -1,0 +1,366 @@
+// Estrutura inicial das coleções no MongoDB
+
+// Coleção: Clientes
+{
+  "_id": ObjectId(),
+  "nome": "string",
+  "cpf": "string",
+  "telefone": "string",
+  "email": "string"
+}
+
+// Coleção: Funcionarios
+{
+  "_id": ObjectId(),
+  "nome": "string",
+  "cpf": "string",
+  "telefone": "string",
+  "dataContratacao": "date",
+  "salario": "number",
+  "email": "string",
+  "cargo": "string"
+}
+
+// Coleção: CategoriaProdutos
+{
+  "_id": ObjectId(),
+  "nome": "string",
+  "descricao": "string"
+}
+
+// Coleção: Produtos
+{
+  "_id": ObjectId(),
+  "nome": "string",
+  "descricao": "string",
+  "preco": "number",
+  "categoriaId": ObjectId()
+}
+
+// Coleção: Fornecedores
+{
+  "_id": ObjectId(),
+  "nome": "string",
+  "telefone": "string",
+  "email": "string",
+  "endereco": "string",
+  "cnpj": "string"
+}
+
+// Coleção: Estoques
+{
+  "_id": ObjectId(),
+  "quantidade": "number",
+  "localizacao": "string",
+  "produtoId": ObjectId()
+}
+
+// Coleção: RegistroArmazenamento
+{
+  "_id": ObjectId(),
+  "dataRegistro": "date",
+  "quantidade": "number",
+  "produtoId": ObjectId(),
+  "fornecedorId": ObjectId(),
+  "estoqueId": ObjectId()
+}
+
+// Coleção: Vendas
+{
+  "_id": ObjectId(),
+  "dataVenda": "date",
+  "valorVenda": "number",
+  "clienteId": ObjectId(),
+  "funcionarioId": ObjectId()
+}
+
+// Coleção: Pagamentos
+{
+  "_id": ObjectId(),
+  "dataPagamento": "date",
+  "valorPagamento": "number",
+  "metodoPagamento": "string",
+  "vendaId": ObjectId()
+}
+
+// Coleção: ItensVenda
+{
+  "_id": ObjectId(),
+  "vendaId": ObjectId(),
+  "produtoId": ObjectId(),
+  "quantidade": "number",
+  "precoUnitario": "number"
+}
+
+// Coleção: ReceitasMedicas
+{
+  "_id": ObjectId(),
+  "clienteId": ObjectId(),
+  "dataReceita": "date"
+}
+
+
+// Exemplos de consultas em MongoDB
+
+// 1. Verificar clientes sem e-mail
+{
+  "email": { "$exists": false }
+}
+
+// 2. Listar clientes em ordem alfabética
+{
+  "find": {},
+  "sort": { "nome": 1 }
+}
+
+// 3. Filtrar clientes com telefone iniciando por "11"
+{
+  "telefone": { "$regex": "^11" }
+}
+
+// 4. Produtos com preço acima de R$100,00
+{
+  "preco": { "$gt": 100 }
+}
+
+// 5. Produtos de uma categoria específica
+{
+  "categoriaId": ObjectId("ID_CATEGORIA")
+}
+
+// 6. Ordenar produtos por preço crescente
+{
+  "find": {},
+  "sort": { "preco": 1 }
+}
+
+// 7. Soma de produtos em estoque
+{
+  "aggregate": [
+    { "$group": { "_id": null, "totalEstoque": { "$sum": "$quantidade" } } }
+  ]
+}
+
+// 8. Preço médio dos produtos
+{
+  "aggregate": [
+    { "$group": { "_id": null, "precoMedio": { "$avg": "$preco" } } }
+  ]
+}
+
+// 9. Buscar clientes que criaram a conta nos últimos 30 dias
+{
+  "dataCriacao": { "$gte": new Date(new Date() - 30 * 24 * 60 * 60 * 1000) }
+}
+
+// 10. Listar produtos fora de estoque
+{
+  "quantidade": { "$lte": 0 }
+}
+
+// 11. Contar clientes ativos
+{
+  "aggregate": [
+    { "$match": { "ativo": true } },
+    { "$count": "clientesAtivos" }
+  ]
+}
+
+// 12. Listar clientes que possuem endereço em São Paulo
+{
+  "endereco.cidade": "São Paulo"
+}
+
+// 13. Buscar produtos com desconto
+{
+  "desconto": { "$exists": true, "$gt": 0 }
+}
+
+// 14. Atualizar preço de todos os produtos de uma categoria em 10%
+{
+  "updateMany": {
+    "filter": { "categoriaId": ObjectId("ID_CATEGORIA") },
+    "update": { "$mul": { "preco": 1.1 } }
+  }
+}
+
+// 15. Filtrar clientes pelo nome (case-insensitive)
+{
+  "nome": { "$regex": ".*nome_cliente.*", "$options": "i" }
+}
+
+// 16. Buscar pedidos realizados entre duas datas
+{
+  "dataPedido": { "$gte": new Date("2023-01-01"), "$lte": new Date("2023-12-31") }
+}
+
+// 17. Agrupar clientes por estado e contar
+{
+  "aggregate": [
+    { "$group": { "_id": "$endereco.estado", "totalClientes": { "$sum": 1 } } }
+  ]
+}
+
+// 18. Ordenar pedidos por data decrescente
+{
+  "find": {},
+  "sort": { "dataPedido": -1 }
+}
+
+// 19. Buscar produtos com nome ou descrição contendo "promoção"
+{
+  "$or": [
+    { "nome": { "$regex": "promoção", "$options": "i" } },
+    { "descricao": { "$regex": "promoção", "$options": "i" } }
+  ]
+}
+
+// 20. Filtrar pedidos com valor total maior que R$500
+{
+  "valorTotal": { "$gt": 500 }
+}
+
+// 21. Contar produtos por categoria
+{
+  "aggregate": [
+    { "$group": { "_id": "$categoriaId", "totalProdutos": { "$sum": 1 } } }
+  ]
+}
+
+// 22. Adicionar um campo calculado de preço final (com desconto aplicado)
+{
+  "aggregate": [
+    {
+      "$addFields": {
+        "precoFinal": { "$subtract": ["$preco", { "$multiply": ["$preco", "$desconto"] }] }
+      }
+    }
+  ]
+}
+
+// 23. Buscar clientes que fizeram mais de 5 pedidos
+{
+  "quantidadePedidos": { "$gt": 5 }
+}
+
+// 24. Remover clientes inativos há mais de um ano
+{
+  "deleteMany": {
+    "filter": { 
+      "ativo": false,
+      "ultimaAtividade": { "$lt": new Date(new Date() - 365 * 24 * 60 * 60 * 1000) }
+    }
+  }
+}
+
+// 25. Buscar produtos com múltiplas tags
+{
+  "tags": { "$all": ["promoção", "novo"] }
+}
+
+// 26. Listar os 10 produtos mais vendidos
+{
+  "aggregate": [
+    { "$sort": { "quantidadeVendida": -1 } },
+    { "$limit": 10 }
+  ]
+}
+
+// 27. Contar pedidos por mês em um ano
+{
+  "aggregate": [
+    { "$match": { "ano": 2023 } },
+    {
+      "$group": {
+        "_id": { "mes": { "$month": "$dataPedido" } },
+        "totalPedidos": { "$sum": 1 }
+      }
+    },
+    { "$sort": { "_id.mes": 1 } }
+  ]
+}
+
+// 28. Atualizar o status de pedidos atrasados para "Atrasado"
+{
+  "updateMany": {
+    "filter": { "dataEntrega": { "$lt": new Date(), "$exists": true }, "status": "Pendente" },
+    "update": { "$set": { "status": "Atrasado" } }
+  }
+}
+
+// 29. Produtos com preço entre R$50 e R$150
+{
+  "preco": { "$gte": 50, "$lte": 150 }
+}
+
+// 30. Buscar os 5 últimos clientes cadastrados
+{
+  "find": {},
+  "sort": { "dataCriacao": -1 },
+  "limit": 5
+}
+
+
+
+// Criação de coleções e dados no MongoDB
+
+// Inserção na coleção Clientes
+db.clientes.insertMany([
+  { "nome": "João Silva", "cpf": "12345678901", "telefone": "11987654321", "email": "joao.silva@gmail.com" },
+  { "nome": "Maria Oliveira", "cpf": "98765432100", "telefone": "11965432100" }
+]);
+
+// Inserção na coleção Funcionarios
+db.funcionarios.insertMany([
+  { "nome": "Ana Souza", "cpf": "11223344556", "telefone": "11987654322", "dataContratacao": ISODate("2019-01-10"), "salario": 2500.50, "email": "ana.souza@gmail.com", "cargo": "Farmacêutica" },
+  { "nome": "Carlos Lima", "cpf": "22334455667", "telefone": "11987654323", "dataContratacao": ISODate("2020-05-15"), "salario": 1800.00, "email": "carlos.lima@gmail.com", "cargo": "Atendente" }
+]);
+
+// Inserção na coleção CategoriaProdutos
+db.categoriaProdutos.insertMany([
+  { "nome": "Medicamentos", "descricao": "Produtos farmacêuticos." },
+  { "nome": "Higiene", "descricao": "Produtos de higiene pessoal." }
+]);
+
+// Inserção na coleção Produtos
+db.produtos.insertMany([
+  { "nome": "Paracetamol", "descricao": "Medicamento analgésico.", "preco": 10.00, "categoriaId": ObjectId("ID_CATEGORIA_MEDICAMENTOS") },
+  { "nome": "Shampoo", "descricao": "Produto para higiene capilar.", "preco": 25.00, "categoriaId": ObjectId("ID_CATEGORIA_HIGIENE") }
+]);
+
+// Inserção na coleção Fornecedores
+db.fornecedores.insertMany([
+  { "nome": "Distribuidora Farma", "telefone": "1133334444", "email": "contato@farma.com", "endereco": "Rua das Flores, 123", "cnpj": "11222333444455" },
+  { "nome": "Higiene Total", "telefone": "1144445555", "email": "vendas@higiene.com", "endereco": "Av. Brasil, 456", "cnpj": "22333444555666" }
+]);
+
+// Inserção na coleção Estoques
+db.estoques.insertMany([
+  { "quantidade": 100, "localizacao": "Setor A", "produtoId": ObjectId("ID_PRODUTO_PARACETAMOL") },
+  { "quantidade": 50, "localizacao": "Setor B", "produtoId": ObjectId("ID_PRODUTO_SHAMPOO") }
+]);
+
+// Inserção na coleção RegistroArmazenamento
+db.registroArmazenamento.insertMany([
+  { "dataRegistro": ISODate("2023-12-01"), "quantidade": 20, "produtoId": ObjectId("ID_PRODUTO_PARACETAMOL"), "fornecedorId": ObjectId("ID_FORNECEDOR_FARMA"), "estoqueId": ObjectId("ID_ESTOQUE_A") }
+]);
+
+// Inserção na coleção Vendas
+db.vendas.insertMany([
+  { "dataVenda": ISODate("2023-12-07"), "valorVenda": 50.00, "clienteId": ObjectId("ID_CLIENTE_JOAO"), "funcionarioId": ObjectId("ID_FUNCIONARIO_ANA") }
+]);
+
+// Inserção na coleção Pagamentos
+db.pagamentos.insertMany([
+  { "dataPagamento": ISODate("2023-12-07"), "valorPagamento": 50.00, "metodoPagamento": "Cartão", "vendaId": ObjectId("ID_VENDA_1") }
+]);
+
+// Inserção na coleção ItensVenda
+db.itensVenda.insertMany([
+  { "vendaId": ObjectId("ID_VENDA_1"), "produtoId": ObjectId("ID_PRODUTO_PARACETAMOL"), "quantidade": 2, "precoUnitario": 10.00 }
+]);
+
+// Inserção na coleção ReceitasMedicas
+db.receitasMedicas.insertMany([
+  { "clienteId": ObjectId("ID_CLIENTE_MARIA"), "dataReceita": ISODate("2023-11-30") }
+]);
